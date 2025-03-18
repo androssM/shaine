@@ -40,12 +40,20 @@ public class DeliverService implements DeliverInterface {
     }
 
     @Override
-    public DeliverDTO updateDeliverById(String id, Deliver deliver) {
-        if (deliverRepository.existsById(id)) {
-            deliverRepository.save(deliver);
-        }
+    public Deliver updateDeliverById(String id, Deliver deliver) {
+       return deliverRepository.findById(id).map(existingDeliver ->{
+           // 🔹 Actualizamos los campos necesarios
 
-        return tranferToDTO(deliver);
+           existingDeliver.setClient(deliver.getClient());
+           existingDeliver.setDetail(deliver.getDetail());
+           existingDeliver.setPrice(deliver.getPrice());
+           existingDeliver.setUrl(deliver.getUrl());
+           existingDeliver.setStatus(deliver.getStatus());
+           return deliverRepository.save(existingDeliver);
+       }).orElseThrow(() ->
+               new ResponseStatusException(HttpStatus.NOT_FOUND, "El pedido con ID " + id + " no existe."));
+
+
     }
 
     @Override

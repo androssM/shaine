@@ -47,6 +47,7 @@ public class DeliverController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDeliverById(@PathVariable String id){
         try{
+
             deliverService.deleteDeliverById(id);
             return ResponseEntity.noContent().build();
         }catch (ResponseStatusException e){
@@ -56,13 +57,9 @@ public class DeliverController {
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<DeliverDTO> deleteDeliverById(@PathVariable String id,DeliverDTO deliverDTO){
-        Deliver deliver  = new Deliver();
-        deliver.setClient(deliverDTO.getClient());
-        deliver.setDetail(deliverDTO.getDetail());
-        deliver.setPrice(deliverDTO.getPrice());
-        deliver.setUrl(deliverDTO.getUrl());
-        deliver.setStatus("pending");
+    public ResponseEntity<Deliver> updateDeliverById(@PathVariable String id,@RequestBody Deliver deliver){
+
+
         return ResponseEntity.ok(deliverService.updateDeliverById(id,deliver));
     }
 }

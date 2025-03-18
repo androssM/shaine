@@ -10,6 +10,6 @@ public interface DeliverInterface {
     public DeliverDTO createDeliver(Deliver deliver);
     public List<Deliver> getDelivers();
     public Optional<Deliver> getDeliverById(String id);
-    public DeliverDTO updateDeliverById(String id,Deliver deliver);
+    public Deliver updateDeliverById(String id,Deliver deliver);
     public void deleteDeliverById(String id);
 }
