@@ -1,5 +1,6 @@
 package com.shane.controller;
 
+import com.shane.component.JwtUtil;
 import com.shane.dto.DeliverDTO;
 import com.shane.entity.Deliver;
 import com.shane.service.DeliverService;
@@ -16,11 +17,18 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/delivers")
 public class DeliverController {
+    private final JwtUtil jwtUtil;
     @Autowired
     DeliverService deliverService;
+
+    public DeliverController(JwtUtil jwtUtil){
+        this.jwtUtil = jwtUtil;
+    }
     @PostMapping
-    public ResponseEntity<DeliverDTO> createDeliver(@Valid @RequestBody DeliverDTO deliverdto) {
+    public ResponseEntity<DeliverDTO> createDeliver(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody DeliverDTO deliverdto) {
         System.out.println(deliverdto);
+        System.out.println("Authorization Header: " + authHeader); // 👀 Verifica si el token llega
+
         Deliver deliver  = new Deliver();
         deliver.setClient(deliverdto.getClient());
         deliver.setDetail(deliverdto.getDetail());
@@ -30,12 +38,13 @@ public class DeliverController {
         return ResponseEntity.ok(deliverService.createDeliver(deliver));
     }
     @GetMapping
-    public ResponseEntity<List<Deliver>> getDelivers(){
+    public ResponseEntity<List<Deliver>> getDelivers(@RequestHeader("Authorization") String authHeader)
+    {
         return ResponseEntity.ok(deliverService.getDelivers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Deliver>> getDeliverById(@PathVariable String id){
+    public ResponseEntity<Optional<Deliver>> getDeliverById(@RequestHeader("Authorization") String authHeader,@PathVariable String id){
         try{
             return ResponseEntity.ok(deliverService.getDeliverById(id));
         } catch (ResponseStatusException e) {
@@ -45,7 +54,7 @@ public class DeliverController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDeliverById(@PathVariable String id){
+    public ResponseEntity<Void> deleteDeliverById(@RequestHeader("Authorization") String authHeader,@PathVariable String id){
         try{
 
             deliverService.deleteDeliverById(id);
@@ -57,7 +66,7 @@ public class DeliverController {
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Deliver> updateDeliverById(@PathVariable String id,@RequestBody Deliver deliver){
+    public ResponseEntity<Deliver> updateDeliverById(@RequestHeader("Authorization") String authHeader,@PathVariable String id,@RequestBody Deliver deliver){
 
 
         return ResponseEntity.ok(deliverService.updateDeliverById(id,deliver));
