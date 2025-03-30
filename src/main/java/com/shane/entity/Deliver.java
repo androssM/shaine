@@ -10,34 +10,35 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "delivers")
 @Data
 public class Deliver {
-    @Id // Indica el identificador único del documento
+    @Id
     private String id;
-    @NotEmpty(message = "El cliente es obligatorio")
-    private String client;
-    @NotEmpty(message = "El detalle del producto es obligatorio")
-    private String detail;
-    @NotNull(message = "El precio es obligatorio")
-    @Min(value = 1, message = "El precio debe ser mayor a 0")
-    private double price;
-    private String status; // "pendiente", "pagado", "enviado"
-    @NotEmpty(message = "El url del producto es obligatorio")
-    private String url;
+
     @CreatedDate
     private LocalDateTime dateCreation;
-    // Constructor vacío (necesario para MongoDB)
+
+    @NotEmpty(message = "El nombre es obligatorio")
+    private String name;
+
+    @NotEmpty(message = "El apellido es obligatorio")
+    private String lastname;
+
+    private String status; // "pendiente", "pagado", "enviado"
+
+    @NotEmpty(message = "Debe haber al menos un producto")
+    private List<Product> products;
+
     public Deliver() {}
 
-    // Constructor con parámetros
-    public Deliver(String client, String detail, double price, String status,String url) {
-        this.client = client;
-        this.detail = detail;
-        this.price = price;
+    public Deliver(String name,String lastName, String status, List<Product> products) {
+        this.name = name;
+        this.lastname = lastName;
         this.status = status;
-        this.url = url;
-        this.dateCreation = LocalDateTime.now();
+        this.products = products;
     }
+
 }

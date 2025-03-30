@@ -30,11 +30,10 @@ public class DeliverController {
         System.out.println("Authorization Header: " + authHeader); // 👀 Verifica si el token llega
 
         Deliver deliver  = new Deliver();
-        deliver.setClient(deliverdto.getClient());
-        deliver.setDetail(deliverdto.getDetail());
-        deliver.setPrice(deliverdto.getPrice());
-        deliver.setUrl(deliverdto.getUrl());
+        deliver.setName(deliverdto.getName());
+        deliver.setLastname(deliverdto.getLastName());
         deliver.setStatus("pending");
+        deliver.setProducts(deliverdto.getProducts());
         return ResponseEntity.ok(deliverService.createDeliver(deliver));
     }
     @GetMapping
