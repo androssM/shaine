@@ -44,11 +44,10 @@ public class DeliverService implements DeliverInterface {
        return deliverRepository.findById(id).map(existingDeliver ->{
            // 🔹 Actualizamos los campos necesarios
 
-           existingDeliver.setClient(deliver.getClient());
-           existingDeliver.setDetail(deliver.getDetail());
-           existingDeliver.setPrice(deliver.getPrice());
-           existingDeliver.setUrl(deliver.getUrl());
+           existingDeliver.setName(deliver.getName());
+           existingDeliver.setLastname(deliver.getLastname());
            existingDeliver.setStatus(deliver.getStatus());
+           existingDeliver.setProducts(deliver.getProducts());
            return deliverRepository.save(existingDeliver);
        }).orElseThrow(() ->
                new ResponseStatusException(HttpStatus.NOT_FOUND, "El pedido con ID " + id + " no existe."));
@@ -65,7 +64,6 @@ public class DeliverService implements DeliverInterface {
     }
 
     public DeliverDTO tranferToDTO(Deliver deliver) {
-        return new DeliverDTO(deliver.getClient(), deliver.getDetail(),
-                deliver.getPrice(), deliver.getUrl());
+        return new DeliverDTO(deliver.getName(),deliver.getLastname(),deliver.getProducts());
     }
 }
