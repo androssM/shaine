@@ -1,5 +1,6 @@
 package com.shane.component;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
+
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
@@ -23,32 +26,39 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse
-            response, FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+
+        String path = request.getRequestURI();
+
+        // Lista de rutas públicas
+        List<String> publicPaths = List.of("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/delivers");
+
+        // Si es una ruta pública, continúa sin validar token
+        if (publicPaths.contains(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // A partir de aquí sigue tu lógica de validación JWT
+        final String authHeader = request.getHeader("Authorization");
+        String jwt = null;
+        String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // 🔹 Quitamos "Bearer "
-            String username = jwtUtil.extractUsername(token);
-
-            System.out.println("🔹 Token recibido: " + token);
-            System.out.println("🔹 Usuario extraído del token: " + username);
-
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                // ✅ Llamamos `validateToken()` aquí
-                if (jwtUtil.validateToken(token, userDetails.getUsername())) {
-                    System.out.println("✅ Token válido, autenticando usuario...");
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    System.out.println("❌ Token inválido o expirado.");
-                }
+            jwt = authHeader.substring(7);
+            try {
+                username = jwtUtil.extractUsername(jwt);
+            } catch (ExpiredJwtException e) {
+                // Token vencido → ignora si quieres, o responde con 401
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expirado");
+                return;
             }
         }
-        chain.doFilter(request, response);
+
+        // Resto de tu lógica...
+        filterChain.doFilter(request, response);
     }
+
 }

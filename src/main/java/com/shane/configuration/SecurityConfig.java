@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -35,9 +36,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // 🔹 Deshabilitar CSRF para API REST
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 🔹 Asegurar API sin estado (Stateless)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register").permitAll()  // 🔹 Permite acceso sin autenticación al login
-                        .requestMatchers("/error").permitAll() // 🔹 Permitir acceso a /error para evitar bloqueos
-                        .anyRequest().authenticated() // 🔹 Requiere autenticación para todo lo demás
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/delivers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/delivers").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
