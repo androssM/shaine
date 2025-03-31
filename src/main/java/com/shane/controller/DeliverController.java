@@ -25,9 +25,9 @@ public class DeliverController {
         this.jwtUtil = jwtUtil;
     }
     @PostMapping
-    public ResponseEntity<DeliverDTO> createDeliver(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody DeliverDTO deliverdto) {
+    public ResponseEntity<DeliverDTO> createDeliver(@Valid @RequestBody DeliverDTO deliverdto) {
         System.out.println(deliverdto);
-        System.out.println("Authorization Header: " + authHeader); // 👀 Verifica si el token llega
+
 
         Deliver deliver  = new Deliver();
         deliver.setName(deliverdto.getName());
